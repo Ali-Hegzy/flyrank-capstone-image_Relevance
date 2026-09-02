@@ -1,6 +1,6 @@
 const {z} = require('zod');
 
-const visionModle = z.object({
+const visionModel = z.object({
     subject : z.string(),
     category : z.string(),
     attributes : z.array(z.string()).nonempty(),
@@ -8,4 +8,4 @@ const visionModle = z.object({
     confidence : z.number().min(0).max(1),
 });
 
-module.exports = {visionModle};
+module.exports = {visionModel};
