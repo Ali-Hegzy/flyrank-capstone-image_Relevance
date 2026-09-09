@@ -107,8 +107,8 @@ Prerequisites
 Setup Steps
 1. Clone the repository and install dependencies:
 ```bash
-    git clone https://github.com/Ali-Hegzy/Image_Relevance_And_Auto-Tagging_express.git
-    cd Image_Relevance_And_Auto-Tagging_express
+    git clone https://github.com/Ali-Hegzy/flyrank-capstone-image_Relevance.git
+    cd flyrank-capstone-image_Relevance
     npm install
 ```
 2. Configure environment variables:
