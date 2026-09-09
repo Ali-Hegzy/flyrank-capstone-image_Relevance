@@ -22,4 +22,15 @@ db.exec(`
         embedding TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
-`)
+`);
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        post_text TEXT,
+        image_id TEXT,
+        cosineSimilarity REAL,
+        status TEXT CHECK(status IN ('approve', 'reject')),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+`);

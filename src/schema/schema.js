@@ -12,4 +12,11 @@ const embeddingSchema = z.object({
     text : z.string().trim().nonempty(),
 });
 
-module.exports = {visionModel, embeddingSchema};
+const reviewSchema = z.object({
+    post_text : z.string(),
+    image_id : z.uuid(),
+    cosineSimilarity : z.number().min(0).max(1),
+    status : z.enum(['approve', 'reject']),
+})
+
+module.exports = {visionModel, embeddingSchema, reviewSchema};

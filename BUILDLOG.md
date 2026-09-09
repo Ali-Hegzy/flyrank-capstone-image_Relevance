@@ -56,3 +56,23 @@
   - Built `suggestImage` in `src/services/guard.service.js`, structuring standard operational responses that differentiate high-confidence matches from explicit guard rejections.
 
 - Validated the Phase 3 Gate: confirmed that a fox-focused query ranks the red fox image first, while out-of-scope/ambiguous queries trigger a safe refusal below the 0.4500 threshold.
+
+
+## Phase 4: Production Layer, Review Workflow & Evaluation Precision
+
+- **AI Assistance:**
+  - Suggested the standard Express.js route and middleware layering for input validation using Zod schemas.
+  - Provided the conceptual definition and standard mathematical formulation of precision ($\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}$) in the context of classification and rejection guards.
+  - Proposed the initial schema definition for the review audit trail table (`reviews`) to record human decisions (`approve` / `reject`).
+  - Drafted the high-level ASCII and Mermaid architecture flowcharts representing the data movement from ingestion to guard rejection.
+
+- **AI Limitations & Contextual Clarifications:**
+  - The AI initially suggested separate and overly granular API routes for approvals and rejections (`/api/suggestions/:id/approve` and `/api/suggestions/:id/reject`), but I unified them into a cleaner, state-driven `POST /api/review` endpoint.
+  - I caught a potential division-by-zero risk in the precision calculation script if both $TP$ and $FP$ evaluated to 0, adding defensive guards to ensure mathematical stability.
+
+- **My Decisions & Engineering Actions (Human Owner):**
+  - Designed and implemented the complete Express API suite (`src/routes/api.routes.js`, `src/controllers/api.controller.js`, `src/middleware/api.middleware.js`) strictly validated via Zod schemas in `src/schema/schema.js`.
+  - Constructed the curated benchmark dataset (`dataset/eval-set.json`) containing 20 test cases -- The 20 test cases written by AI -- balancing positive domain matches and out-of-distribution mismatch scenarios.
+  - Built and executed the automated evaluation runner (`scripts/run-eval.js`), officially measuring performance metrics and confirming:
+    $$\text{Precision} = \frac{10}{10 + 0} = 1.00 \quad (100\%)$$
+  - Passed the Phase 4 Gate: validated 100% precision with zero false positives (0 FP) across the evaluation set, finalized `README.md`, verified `EVIDENCE.md`, and prepared the repository for final submission.
