@@ -24,4 +24,42 @@ function cosineSimilarity(vecA, vecB) {
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-module.exports = { cosineSimilarity };
+/**
+ * Comparing the query vector against all images and ranking them in descending order of similarity.
+ * @param {number[]} queryVector Vector of the text to be searched for
+ * @param {Array<{id: number, file_path: string, subject: string, caption: string, embedding: string}>} imagesList
+ * @param {number} topK Number of results to return
+ */
+function findTopMatches(queryVector, imagesList, topK = 5) {
+    const scored = [];
+
+    for (const img of imagesList) {
+        let imgVector;
+        try {
+            imgVector = typeof img.embedding === 'string' ? JSON.parse(img.embedding) : img.embedding;
+        } catch {
+            continue;
+        }
+
+        if (!Array.isArray(imgVector) || imgVector.length === 0) continue;
+
+        const score = cosineSimilarity(queryVector, imgVector);
+
+        scored.push({
+            id: img.id,
+            filePath: img.file_path,
+            subject: img.subject,
+            caption: img.caption,
+            similarity: Number(score.toFixed(4)),
+        });
+    }
+
+    scored.sort((a, b) => b.similarity - a.similarity);
+
+    return scored.slice(0, topK);
+}
+
+module.exports = {
+    cosineSimilarity,
+    findTopMatches,
+};

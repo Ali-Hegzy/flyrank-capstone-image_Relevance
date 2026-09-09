@@ -26,7 +26,37 @@ function insertImage(imageRecord) {
   return stmt.run(imageRecord);
 }
 
+function getImagesWithoutEmbeddings() {
+  const stmt = db.prepare(`
+    SELECT id, file_path, subject, category, caption, attributes, embedding
+    FROM images
+    WHERE embedding IS NULL OR embedding = '[]'
+  `);
+  return stmt.all();
+}
+
+function updateImageEmbedding(id, embeddingVector) {
+  const stmt = db.prepare(`
+    UPDATE images
+    SET embedding = ?
+    WHERE id = ?
+  `);
+  return stmt.run(JSON.stringify(embeddingVector), id);
+}
+
+function getAllImagesWithEmbeddings() {
+  const stmt = db.prepare(`
+    SELECT id, file_path, subject, category, caption, embedding
+    FROM images
+    WHERE embedding IS NOT NULL AND embedding != '[]'
+  `);
+  return stmt.all();
+}
+
 module.exports = {
   isImageProcessed,
   insertImage,
+  getImagesWithoutEmbeddings,
+  updateImageEmbedding,
+  getAllImagesWithEmbeddings
 };

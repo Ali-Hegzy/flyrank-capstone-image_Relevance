@@ -35,3 +35,24 @@
   - Audited the runtime behavior of `withRetry` and `sleep`, analyzing how the Event Loop and closures handled function parameters under test executions.
   - Implemented and executed the batch processing script (`src/scripts/batch-process.js`) using `better-sqlite3`, verifying the idempotency mechanism (`isImageProcessed`) across the 50-image dataset.
   - Inspected the SQLite database records and verified that attributes, confidence scores, and temporary embeddings were stored accurately to pass the Phase 2 Gate.
+
+## Phase 3: Matching Engine & Mismatch Guard Implementation
+
+- **AI Assistance:**
+  - Provided the local embedding pipeline setup using `@xenova/transformers` with the `Xenova/all-MiniLM-L6-v2` model (384-d vectors) using mean pooling and normalization.
+  - Implemented the initial vector cosine similarity logic and explained how V8's native array sorting utilizes the hybrid Timsort algorithm ($O(n \log n)$) rather than a naive $O(n^2)$ comparator.
+  - Clarified architectural patterns including Singleton caching for the model pipeline instance and structural defensive checks (`catch { continue; }` with optional catch binding) for handling corrupted JSON embeddings.
+  - Explained statistical thresholding techniques, differentiating between simplistic arithmetic averages and margin-based decision boundaries between distributions.
+
+- **AI Limitations & Contextual Clarifications:**
+  - The AI initially suggested a dual-use API design (checking a user-uploaded image against text) before I pointed out that the project scope only requires matching a blog post to an indexed image library and rejecting weak candidates.
+  - I analyzed why botanical and Latin taxonomical terms (*Vulpes vulpes*, *Cervidae*) yielded lower semantic scores (~0.27) compared to natural language descriptions, preventing an overly aggressive threshold drop.
+
+- **My Decisions & Engineering Actions (Human Owner):**
+  - Designed and executed an empirical benchmark comparing three distinct semantic tiers: Positive Matches (`0.4618` – `0.7669`), Paraphrased/Scientific terms (`0.2` – `0.4045`), and Mismatches (`0.1259` – `0.2712`).
+  - Derived the production cutoff threshold using boundary separation:
+    $$\text{Noise Ceiling} = \text{Max}(\text{Mismatch}) + 0.08 = 0.2712 + 0.08 = 0.3512$$
+    $$\text{Threshold} = \frac{0.3512 + 0.4618}{2} \approx 0.4065 \implies \text{Adopted } 0.4500$$
+  - Built `suggestImage` in `src/services/guard.service.js`, structuring standard operational responses that differentiate high-confidence matches from explicit guard rejections.
+
+- Validated the Phase 3 Gate: confirmed that a fox-focused query ranks the red fox image first, while out-of-scope/ambiguous queries trigger a safe refusal below the 0.4500 threshold.

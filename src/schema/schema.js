@@ -8,4 +8,8 @@ const visionModel = z.object({
     confidence : z.number().min(0).max(1),
 });
 
-module.exports = {visionModel};
+const embeddingSchema = z.object({
+    text : z.string().trim().nonempty(),
+});
+
+module.exports = {visionModel, embeddingSchema};
